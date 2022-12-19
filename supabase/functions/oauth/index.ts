@@ -100,6 +100,10 @@ serve(async (req) => {
       params[p[0]] = p[1];
     }
 
+
+    // will get params[code]
+    // the referencing params[state] should be the email (i.e., jacob, add that to the authorization request so we can create the user here in supabase)
+
       return new Response(JSON.stringify({ hello: 'world', request: req.body, params: params }), 
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -145,4 +149,4 @@ serve(async (req) => {
 //   --data '{"name":"Functions"}'
 
 
-curl -L -X POST 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth?testing=params' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0cXZtZmdiYXF5eXR4eG1saW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0MDU5MDgsImV4cCI6MTk4Njk4MTkwOH0.lJaM59RP34vUZ7NREy_uX_luab6b7Je5i4Y3PqVB3LA' --data '{"name":"Functions"}'
+// curl -L -X POST 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth?testing=params' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0cXZtZmdiYXF5eXR4eG1saW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzE0MDU5MDgsImV4cCI6MTk4Njk4MTkwOH0.lJaM59RP34vUZ7NREy_uX_luab6b7Je5i4Y3PqVB3LA' --data '{"name":"Functions"}'
