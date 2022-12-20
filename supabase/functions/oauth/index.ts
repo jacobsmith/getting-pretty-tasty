@@ -100,6 +100,17 @@ serve(async (req) => {
       params[p[0]] = p[1];
     }
 
+    if (params.code) {
+      const { data, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
+
+      const tokens = await krogerAPI.tradeCodeForTokens(params.code);
+
+      await supabase.from('user_access_tokens').insert({
+        user_id: data.id,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+      });
+    }
 
     // will get params[code]
     // the referencing params[state] should be the email (i.e., jacob, add that to the authorization request so we can create the user here in supabase)
