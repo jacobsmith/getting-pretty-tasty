@@ -53,3 +53,7 @@ class KrogerAPI {
 
   }
 }
+
+const krogerAPI = new KrogerAPI();
+
+export { krogerAPI };

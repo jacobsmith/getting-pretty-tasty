@@ -8,6 +8,7 @@
 
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { krogerAPI } from '../_shared/krogerAPI.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -103,7 +104,11 @@ serve(async (req) => {
     if (params.code) {
       const { data, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
 
+      console.log('supabase client auth signup response: ', data, error);
+
       const tokens = await krogerAPI.tradeCodeForTokens(params.code);
+
+      console.log('got tokens: ', tokens);
 
       await supabase.from('user_access_tokens').insert({
         user_id: data.id,

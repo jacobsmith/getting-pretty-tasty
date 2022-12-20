@@ -1,4 +1,10 @@
 {
   "deno.enable": true,
-  "deno.unstable": true
+  "deno.unstable": true,
+  "typescript.implementationsCodeLens.enabled": true,
+  "typescript.inlayHints.parameterTypes.enabled": true,
+  "javascript.validate.enable": true,
+  "typescript.validate.enable": true,
+  "eslint.options": {
+  }
 }

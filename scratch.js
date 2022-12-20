@@ -14,9 +14,10 @@ let fullAuthUrl = authUrl + '?' +
   'client_id=' + client_id + '&' +
   'response_type=' + response_type + '&' +
   'redirect_uri=' + redirect_uri + '&' + 
-  'scope=' + scope
+  'scope=' + scope + '&' +
+  'state=jacob.wesley.smith@gmail.com';
 
-  // console.log(fullAuthUrl);
+  console.log(fullAuthUrl);
 
 // Step 1. User hits the fullAuthUrl above
 // Step 2. We get back at /oauth the state/code
@@ -52,21 +53,21 @@ const base64ClientIdClientSecret = btoa(krogerClientId + ':' + krogerClientSecre
 const jacobTokens = {
 };
 
-(async () => {
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      Authorization: 'Basic ' + base64ClientIdClientSecret,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: jacobTokens.refresh_token,
-      redirect_uri
-    })
-  });
+// (async () => {
+//   const response = await fetch(tokenUrl, {
+//     method: 'POST',
+//     headers: {
+//       Authorization: 'Basic ' + base64ClientIdClientSecret,
+//       'Content-Type': 'application/x-www-form-urlencoded'
+//     },
+//     body: new URLSearchParams({
+//       grant_type: 'refresh_token',
+//       refresh_token: jacobTokens.refresh_token,
+//       redirect_uri
+//     })
+//   });
 
-  response.json().then(data => {
-    console.log(data);
-  });
-})();
+//   response.json().then(data => {
+//     console.log(data);
+//   });
+// })();
