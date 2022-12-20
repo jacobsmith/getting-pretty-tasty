@@ -96,22 +96,22 @@ serve(async (req) => {
     const id = matchingPath ? matchingPath.pathname.groups.id : null
 
     const u=new URL(req.url);
-    let params = {};
+    let params: { [key: string]: string } = {};
     for (const p of u.searchParams) {
       params[p[0]] = p[1];
     }
 
     if (params.code) {
-      const { data, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
+      const { data: { user }, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
 
-      console.log('supabase client auth signup response: ', data, error);
+      console.log('supabase client auth signup response: ', user, error);
 
       const tokens = await krogerAPI.tradeCodeForTokens(params.code);
 
       console.log('got tokens: ', tokens);
 
-      await supabase.from('user_access_tokens').insert({
-        user_id: data.id,
+      await supabaseClient.from('user_access_tokens').insert({
+        user_id: user?.id,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
       });

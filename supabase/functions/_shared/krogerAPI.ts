@@ -1,13 +1,23 @@
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
 const redirect_uri = 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth';
+let apiUrl = 'https://api.kroger.com/v1/';
+let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
+let tokenUrl = 'https://api.kroger.com/v1/connect/oauth2/token';
+let locationsUrl = 'https://api.kroger.com/v1/locations';
 
 class KrogerAPI {
-  krogerClientSecret: string;
-  krogerClientId: string;
+  supabaseClient: SupabaseClient;
+  krogerClientSecret: string | undefined;
+  krogerClientId: string | undefined;
 
-  constructor(supabaseClient) {
+  constructor(supabaseClient: SupabaseClient) {
     this.supabaseClient = supabaseClient;
-    krogerClientSecret = await this.clientSecret();
-    krogerClientId = await this.clientId();
+  }
+
+  async init() {
+    this.krogerClientSecret = await this.clientSecret();
+    this.krogerClientId = await this.clientId();
   }
 
   async clientSecret() {
@@ -31,7 +41,6 @@ class KrogerAPI {
   }
 
   async tradeCodeForTokens(authCode: string) {
-    (async () => {
       const response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
@@ -45,15 +54,17 @@ class KrogerAPI {
         })
       });
 
-      response.json().then(data => {
-        console.log(data);
-        return data;
-      });
-    })();
-
+    const data = await response.json()
+    console.log(data);
+    return data;
   }
 }
+    
+const supabaseClient = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+)
 
-const krogerAPI = new KrogerAPI();
+const krogerAPI = new KrogerAPI(supabaseClient);
 
 export { krogerAPI };
