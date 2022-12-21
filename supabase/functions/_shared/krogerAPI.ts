@@ -64,8 +64,35 @@ class KrogerAPI {
       });
 
     const data = await response.json()
-    console.log(data);
     return data;
+  }
+
+  async getAppTokens() {
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + this.basicAuthHeaderValue(),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        scope: 'product.compact'
+      })
+    });
+
+    const data = await response.json()
+    return data;
+  }
+
+  async getLocations(zipCode: string) {
+    let response = await fetch(locationsUrl + '?filter.zipCode.near=' + zipCode, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jacobTokens.access_token}`
+      }
+    });
+    let data = await response.json();
+    console.log(data);
   }
 }
     
