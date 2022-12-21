@@ -1,5 +1,8 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+import { config } from 'https://deno.land/x/dotenv/mod.ts';
+await config({export: true});
+
 const redirect_uri = 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth';
 let apiUrl = 'https://api.kroger.com/v1/';
 let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
@@ -10,28 +13,27 @@ class KrogerAPI {
   supabaseClient: SupabaseClient;
   krogerClientSecret: string | undefined;
   krogerClientId: string | undefined;
+  appAccessToken: string | undefined;
 
-  constructor(supabaseClient: SupabaseClient, krogerClientSecret: string | undefined, krogerClientId: string | undefined) {
+  constructor(supabaseClient: SupabaseClient, krogerClientSecret: string | undefined, krogerClientId: string | undefined, appAccessToken: string | undefined) {
     this.supabaseClient = supabaseClient;
     this.krogerClientSecret = krogerClientSecret;
     this.krogerClientId = krogerClientId;
+    this.appAccessToken = appAccessToken;
   }
 
   static async init(supabaseClient: SupabaseClient) {
     const krogerClientSecret = await this.clientSecret(supabaseClient);
     const krogerClientId = await this.clientId(supabaseClient);
+    const appAccessToken = await this.getAppToken(krogerClientId, krogerClientSecret);
 
-    return new KrogerAPI(supabaseClient, krogerClientSecret, krogerClientId);
+    return new KrogerAPI(supabaseClient, krogerClientSecret, krogerClientId, appAccessToken);
   }
 
   static async clientSecret(supabaseClient: SupabaseClient) {
     const { data, error } = await supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-secret');
     if (error) throw error;
-
-    console.log('client secret: ', data[0].value)
-
     const krogerClientSecret = data[0].value;
-
     return krogerClientSecret;
   }
 
@@ -39,21 +41,18 @@ class KrogerAPI {
     const { data, error } = await supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-id');
     if (error) throw error;
     const krogerClientId = data[0].value;
-
-    console.log('client id: ', krogerClientId)
-
     return krogerClientId;
   }
 
-  basicAuthHeaderValue() {
-    return btoa(this.krogerClientId + ':' + this.krogerClientSecret);
+  static basicAuthHeaderValue(krogerClientId, krogerClientSecret) {
+    return btoa(krogerClientId + ':' + krogerClientSecret);
   }
 
   async tradeCodeForTokens(authCode: string) {
       const response = await fetch(tokenUrl, {
         method: 'POST',
         headers: {
-          Authorization: 'Basic ' + this.basicAuthHeaderValue(),
+          Authorization: 'Basic ' + KrogerAPI.basicAuthHeaderValue(this.krogerClientId, this.krogerClientSecret),
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
@@ -67,11 +66,11 @@ class KrogerAPI {
     return data;
   }
 
-  async getAppTokens() {
+  static async getAppToken(krogerClientId, krogerClientSecret) {
     const response = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
-        Authorization: 'Basic ' + this.basicAuthHeaderValue(),
+        Authorization: 'Basic ' + this.basicAuthHeaderValue(krogerClientId, krogerClientSecret),
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams({
@@ -80,15 +79,15 @@ class KrogerAPI {
       })
     });
 
-    const data = await response.json()
-    return data;
+    const data = await response.json();
+    return data.access_token;
   }
 
   async getLocations(zipCode: string) {
     let response = await fetch(locationsUrl + '?filter.zipCode.near=' + zipCode, {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${jacobTokens.access_token}`
+        Authorization: `Bearer ${this.appAccessToken}`
       }
     });
     let data = await response.json();
