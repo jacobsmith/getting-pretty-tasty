@@ -15,61 +15,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
 }
 
-interface Task {
-  name: string
-  status: number
-}
-
-async function getTask(supabaseClient: SupabaseClient, id: string) {
-  const { data: task, error } = await supabaseClient.from('tasks').select('*').eq('id', id)
-  if (error) throw error
-
-  return new Response(JSON.stringify({ task }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
-async function getAllTasks(supabaseClient: SupabaseClient) {
-  const { data: tasks, error } = await supabaseClient.from('tasks').select('*')
-  if (error) throw error
-
-  return new Response(JSON.stringify({ tasks }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
-async function deleteTask(supabaseClient: SupabaseClient, id: string) {
-  const { error } = await supabaseClient.from('tasks').delete().eq('id', id)
-  if (error) throw error
-
-  return new Response(JSON.stringify({}), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
-async function updateTask(supabaseClient: SupabaseClient, id: string, task: Task) {
-  const { error } = await supabaseClient.from('tasks').update(task).eq('id', id)
-  if (error) throw error
-
-  return new Response(JSON.stringify({ task }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
-async function createTask(supabaseClient: SupabaseClient, task: Task) {
-  const { error } = await supabaseClient.from('tasks').insert(task)
-  if (error) throw error
-
-  return new Response(JSON.stringify({ task }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    status: 200,
-  })
-}
-
 serve(async (req) => {
   const { url, method } = req
 
@@ -90,11 +35,6 @@ serve(async (req) => {
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
-    // For more details on URLPattern, check https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
-    const taskPattern = new URLPattern({ pathname: '/restful-tasks/:id' })
-    const matchingPath = taskPattern.exec(url)
-    const id = matchingPath ? matchingPath.pathname.groups.id : null
-
     const u=new URL(req.url);
     let params: { [key: string]: string } = {};
     for (const p of u.searchParams) {
@@ -102,13 +42,26 @@ serve(async (req) => {
     }
 
     if (params.code) {
-      const { data: { user }, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
+      let user: any;
+      console.log('params state: ', params.state, params);
+      const { data: users } = await supabaseClient.from('users').select('*').eq('email', params.state);
+      const existingUser = users[0];
 
-      console.log('supabase client auth signup response: ', user, error);
+      if (existingUser) {
+        console.log('found user')
+        user = existingUser;
+      } else {
+        const { data: { user: newUser }, error } = await supabaseClient.auth.signUp({ email: params.state, password: 'password' });
+
+        let user = newUser;
+        console.log('supabase client auth signup response: ', user, error);
+      }
 
       const tokens = await krogerAPI.tradeCodeForTokens(params.code);
 
       console.log('got tokens: ', tokens);
+
+      await supabaseClient.from('user_access_tokens').delete('*').eq('user_id', user.id);
 
       await supabaseClient.from('user_access_tokens').insert({
         user_id: user?.id,
@@ -126,28 +79,6 @@ serve(async (req) => {
           status: 200,
         }
       );
-
-    let task = null
-    if (method === 'POST' || method === 'PUT') {
-      const body = await req.json()
-      task = body.task
-    }
-
-    // call relevant method based on method and id
-    switch (true) {
-      case id && method === 'GET':
-        return getTask(supabaseClient, id as string)
-      case id && method === 'PUT':
-        return updateTask(supabaseClient, id as string, task)
-      case id && method === 'DELETE':
-        return deleteTask(supabaseClient, id as string)
-      case method === 'POST':
-        return createTask(supabaseClient, task)
-      case method === 'GET':
-        return getAllTasks(supabaseClient)
-      default:
-        return getAllTasks(supabaseClient)
-    }
   } catch (error) {
     console.error(error)
 
