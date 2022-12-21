@@ -70,15 +70,12 @@ serve(async (req) => {
       });
     }
 
-    // will get params[code]
-    // the referencing params[state] should be the email (i.e., jacob, add that to the authorization request so we can create the user here in supabase)
-
-      return new Response(JSON.stringify({ hello: 'world', request: req.body, params: params }), 
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      );
+    return new Response(JSON.stringify({ hello: 'world', request: req.body, params: params }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
   } catch (error) {
     console.error(error)
 

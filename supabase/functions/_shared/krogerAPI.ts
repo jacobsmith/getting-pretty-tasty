@@ -11,27 +11,36 @@ class KrogerAPI {
   krogerClientSecret: string | undefined;
   krogerClientId: string | undefined;
 
-  constructor(supabaseClient: SupabaseClient) {
+  constructor(supabaseClient: SupabaseClient, krogerClientSecret: string | undefined, krogerClientId: string | undefined) {
     this.supabaseClient = supabaseClient;
+    this.krogerClientSecret = krogerClientSecret;
+    this.krogerClientId = krogerClientId;
   }
 
-  async init() {
-    this.krogerClientSecret = await this.clientSecret();
-    this.krogerClientId = await this.clientId();
+  static async init(supabaseClient: SupabaseClient) {
+    const krogerClientSecret = await this.clientSecret(supabaseClient);
+    const krogerClientId = await this.clientId(supabaseClient);
+
+    return new KrogerAPI(supabaseClient, krogerClientSecret, krogerClientId);
   }
 
-  async clientSecret() {
-    const { data, error } = await this.supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-secret');
+  static async clientSecret(supabaseClient: SupabaseClient) {
+    const { data, error } = await supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-secret');
     if (error) throw error;
+
+    console.log('client secret: ', data[0].value)
+
     const krogerClientSecret = data[0].value;
 
     return krogerClientSecret;
   }
 
-  async clientId() {
-    const { data, error } = await this.supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-id');
+  static async clientId(supabaseClient: SupabaseClient) {
+    const { data, error } = await supabaseClient.from('secrets').select('*').eq('key', 'kroger-client-id');
     if (error) throw error;
     const krogerClientId = data[0].value;
+
+    console.log('client id: ', krogerClientId)
 
     return krogerClientId;
   }
@@ -65,6 +74,6 @@ const supabaseClient = createClient(
   Deno.env.get('SUPABASE_ANON_KEY') ?? '',
 )
 
-const krogerAPI = new KrogerAPI(supabaseClient);
+const krogerAPI = await KrogerAPI.init(supabaseClient);
 
 export { krogerAPI };
