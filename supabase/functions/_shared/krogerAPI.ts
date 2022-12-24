@@ -1,6 +1,6 @@
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
 import { config } from 'https://deno.land/x/dotenv/mod.ts';
+import supabaseClient from './supabaseClient.ts';
+import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 await config({export: true});
 
 const redirect_uri = 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth';
@@ -8,14 +8,19 @@ let apiUrl = 'https://api.kroger.com/v1/';
 let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
 let tokenUrl = 'https://api.kroger.com/v1/connect/oauth2/token';
 let locationsUrl = 'https://api.kroger.com/v1/locations';
+const productsUrl = 'https://api.kroger.com/v1/products';
 
 class KrogerAPI {
   supabaseClient: SupabaseClient;
-  krogerClientSecret: string | undefined;
-  krogerClientId: string | undefined;
+  krogerClientSecret: string;
+  krogerClientId: string;
   appAccessToken: string | undefined;
+  locationId?: string;
+  userAccessToken?: string;
+  userRefreshToken?: string;
+  userEmail?: string;
 
-  constructor(supabaseClient: SupabaseClient, krogerClientSecret: string | undefined, krogerClientId: string | undefined, appAccessToken: string | undefined) {
+  constructor(supabaseClient: SupabaseClient, krogerClientSecret: string, krogerClientId: string, appAccessToken: string | undefined) {
     this.supabaseClient = supabaseClient;
     this.krogerClientSecret = krogerClientSecret;
     this.krogerClientId = krogerClientId;
@@ -44,7 +49,7 @@ class KrogerAPI {
     return krogerClientId;
   }
 
-  static basicAuthHeaderValue(krogerClientId, krogerClientSecret) {
+  static basicAuthHeaderValue(krogerClientId: string, krogerClientSecret: string) {
     return btoa(krogerClientId + ':' + krogerClientSecret);
   }
 
@@ -66,7 +71,7 @@ class KrogerAPI {
     return data;
   }
 
-  static async getAppToken(krogerClientId, krogerClientSecret) {
+  static async getAppToken(krogerClientId: string, krogerClientSecret: string) {
     const response = await fetch(tokenUrl, {
       method: 'POST',
       headers: {
@@ -93,13 +98,32 @@ class KrogerAPI {
     let data = await response.json();
     console.log(data);
   }
+
+  setLocation(locationId: string) {
+    this.locationId = locationId;
+    return this;
+  }
+
+  setUserTokens(accessToken: string, refreshToken: string, userEmail: string) {
+    this.userAccessToken = accessToken;
+    this.userRefreshToken = refreshToken;
+    this.userEmail = userEmail;
+    return this;
+  }
+
+  async getProducts(term: string) {
+    let response = await fetch(productsUrl + '?filter.locationId=' + this.locationId + '&filter.term=' + term, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.appAccessToken}`
+      }
+    });
+    let data = await response.json();
+
+    return data;
+  }
 }
     
-const supabaseClient = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-)
-
 const krogerAPI = await KrogerAPI.init(supabaseClient);
 
 export { krogerAPI };

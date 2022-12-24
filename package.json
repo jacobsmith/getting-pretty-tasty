@@ -4,6 +4,7 @@
     "supabase": "^1.26.9"
   },
   "dependencies": {
-    "node-fetch": "^3.3.0"
+    "node-fetch": "^3.3.0",
+    "openai": "^3.1.0"
   }
 }
