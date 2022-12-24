@@ -8,6 +8,7 @@ let apiUrl = 'https://api.kroger.com/v1/';
 let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
 let tokenUrl = 'https://api.kroger.com/v1/connect/oauth2/token';
 let locationsUrl = 'https://api.kroger.com/v1/locations';
+let cartUrl = 'https://api.kroger.com/v1/cart/add';
 const productsUrl = 'https://api.kroger.com/v1/products';
 
 class KrogerAPI {
@@ -121,6 +122,23 @@ class KrogerAPI {
     let data = await response.json();
 
     return data;
+  }
+
+  async addItemsToCart(items: any[]) {
+    let response = await fetch(cartUrl, {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.userAccessToken}`
+      },
+      body: JSON.stringify({ items: items })
+    });
+
+    if (response.ok) {
+      return { success: true, error: null }
+    }
+    
+    return { success: false, error: response }
   }
 }
     

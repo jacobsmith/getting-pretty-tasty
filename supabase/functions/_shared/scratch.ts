@@ -19,9 +19,13 @@ if (error) {
 
 const { access_token, refresh_token } = data[0];
 
-const chicken = await krogerAPI.
+const userKroger = await krogerAPI.
 setLocation(westfieldKroger)
 .setUserTokens(access_token, refresh_token, 'jacob.wesley.smith@gmail.com')
-.getProducts('chicken');
 
-console.log('chicken: ', chicken);
+// userKroger.getProducts('chicken');
+
+const tysonChickenUPC = '0026082900000';
+
+const response = await userKroger.addItemsToCart([{ upc: tysonChickenUPC, quantity: 1 }]);
+console.log(response);
