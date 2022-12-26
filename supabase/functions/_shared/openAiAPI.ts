@@ -2,7 +2,7 @@
 
 import { OpenAI } from 'https://deno.land/x/openai/mod.ts';
 
-const openai = new OpenAI('fill-me-in');
+const openai = new OpenAI(Deno.env.get('OPENAPI_PRIVATE_KEY') ?? '');
 
 const openaiWrapper = {
   createCompletion: async ({ prompt, engine, temperature = 1, maxTokens = 500, topP, frequencyPenalty, presencePenalty }:

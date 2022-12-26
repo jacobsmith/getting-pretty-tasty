@@ -7,27 +7,24 @@
 
 // start flow over again
 
-import { confirm } from 'https://deno.land/x/inquirer/mod.ts';
+import { confirm, input } from 'https://deno.land/x/inquirer/mod.ts';
 import mealPromptRequest from './openAiAPI.ts';
 import { krogerAPI } from './krogerAPI.ts';
 import supabaseClient from './supabaseClient.ts';
+import jsonic from "https://esm.sh/jsonic";
 
-// const mealInput = (await inquirer.prompt([
-//   {
-//     type: 'input',
-//     name: 'meal',
-//     message: 'What meal are you looking for?'
-//   }
-// ])).meal;
+const mealInput = (await input(
+  { message: 'What meal are you looking for?' }
+));
 
-let mealInput = `
-I want the output in JSON as follows:
-{
+let mealInputPrompt = `
+Prompt: Give me a recipe and an ingredient list for a meal.
+Response: {
   "meal_name": "Meal Name",
   "ingredients": [
-    { name: "ingredient 1", amount: "amount" },
-    { name: "ingredient 2", amount: "amount" },
-    { name: "ingredient 3", amount: "amount" }
+    { "name": "ingredient 1", amount: "1 cup" },
+    { "name": "ingredient 2", amount: "2 tablespoons" },
+    { "name": "ingredient 3", amount: "amount" }
   ],
   "instructions": [
     "instruction 1",
@@ -36,23 +33,26 @@ I want the output in JSON as follows:
   ]
 }
 
-Give me a recipe and an ingredient list for a meal that can serve 5 and has chicken and pasta.
-
-Only include the JSON output.
+Prompt: Give me a recipe and an ingredient list for a meal that can serve 5. ${mealInput}.
+Response:
 `;
-const openAPIResponse = await mealPromptRequest(mealInput);
+// temp remove so we can test kroger implementation
+const openAPIResponse = await mealPromptRequest(mealInputPrompt);
 const mealOutput = openAPIResponse.choices[0].text;
+
+// console.log('mealOutput: ', mealOutput);
 
 let parsedMealOutput = [];
 try {
-  parsedMealOutput = JSON.parse(mealOutput);
+  parsedMealOutput = jsonic(mealOutput);
 } catch (e) {
   console.log(mealOutput, "could not parse as JSON");
   throw e;
 }
 
-
 // ask if user wants to add meal to cart
+
+console.log(parsedMealOutput);
 
 const addToCart = (await confirm({
     message: 'Add these ingredients to your cart?'
@@ -62,6 +62,7 @@ if (addToCart) {
   const westfieldKroger = '02100983';
 
   const { data, error } = await supabaseClient.from('user_access_tokens').select('*');
+  console.log(data);
 
   if (error) {
     console.log('error: ', error);
@@ -75,7 +76,22 @@ if (addToCart) {
     .setUserTokens(access_token, refresh_token, 'jacob.wesley.smith@gmail.com')
 
   // add meal to cart
-  parsedMealOutput.ingredients.forEach((ingredient: any) => {
-    userKroger.addItemsToCart([{ upc: ingredient.upc, quantity: 1 }]);
-  });
+  const products = await Promise.all(parsedMealOutput.ingredients.map(async (ingredient: any) => {
+
+    const { data: products } = await userKroger.getProducts(ingredient.name);
+    return products[0];
+  }));
+
+  console.log('products: ', products);
+
+  const productOptions = products.map((product) => {
+    if (product.upc) {
+      return { upc: product.upc, quantity: 1 };
+    }
+
+    return null;
+  }).filter(x => x !== null);
+  const itemsToCartResponse = await userKroger.addItemsToCart(productOptions);
+  console.log(itemsToCartResponse);
+
 }
