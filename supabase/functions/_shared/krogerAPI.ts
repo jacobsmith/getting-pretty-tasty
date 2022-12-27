@@ -72,6 +72,23 @@ class KrogerAPI {
     return data;
   }
 
+  async refreshTokens() {
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Basic ' + KrogerAPI.basicAuthHeaderValue(this.krogerClientId, this.krogerClientSecret),
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: this.userRefreshToken
+      } as any)
+    });
+
+    const data = await response.json()
+    return data;
+  }
+
   static async getAppToken(krogerClientId: string, krogerClientSecret: string) {
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -136,6 +153,36 @@ class KrogerAPI {
 
     if (response.ok) {
       return { success: true, error: null }
+    }
+
+    if (response.status === 401) {
+      console.log('unauthorized, refreshing token');
+      const refreshTokenResponse = await this.refreshTokens();
+
+      console.log('refreshTokenResponse: ', refreshTokenResponse);
+
+      if (refreshTokenResponse.access_token) {
+        this.userAccessToken = refreshTokenResponse.access_token;
+        this.userRefreshToken = refreshTokenResponse.refresh_token;
+
+        const { data, error } = await this.supabaseClient.from('users').select('*').eq('email', this.userEmail);
+
+        console.log('refreshed token:', data);
+
+        if (error) { throw error; }
+
+        const user = data[0];
+
+        console.log(user);
+
+
+        await this.supabaseClient
+          .from('user_access_tokens')
+          .update({ refresh_token: refreshTokenResponse.refresh_token, access_token: refreshTokenResponse.access_token })
+          .eq('email', this.userEmail);
+
+        return this.addItemsToCart(items);
+      }
     }
     
     return { success: false, error: response }

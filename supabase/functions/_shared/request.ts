@@ -62,7 +62,7 @@ if (addToCart) {
   const westfieldKroger = '02100983';
 
   const { data, error } = await supabaseClient.from('user_access_tokens').select('*');
-  console.log(data);
+  // console.log(data);
 
   if (error) {
     console.log('error: ', error);
@@ -82,7 +82,7 @@ if (addToCart) {
     return products[0];
   }));
 
-  console.log('products: ', products);
+  // console.log('products: ', products);
 
   const productOptions = products.map((product) => {
     if (product.upc) {
