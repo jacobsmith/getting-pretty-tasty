@@ -24,12 +24,12 @@ let fullAuthUrl = authUrl + '?' +
 // Step 3. We send a POST request to the token url with the received code and trade that for tokens
 // Step 4. We get a refresh token and access tokens
 
-const userCodeJacob = 'code-from-auth-process';
+// const userCodeJacob = 'code-from-auth-process';
 
-const krogerClientSecret = 'client-secret';
-const krogerClientId = 'getsprettytasty-6fe79c7e664cd43d0c322ee1465ec5697471146573710013139';
+// const krogerClientSecret = 'client-secret';
+// const krogerClientId = 'getsprettytasty-6fe79c7e664cd43d0c322ee1465ec5697471146573710013139';
 
-const base64ClientIdClientSecret = btoa(krogerClientId + ':' + krogerClientSecret);
+// const base64ClientIdClientSecret = btoa(krogerClientId + ':' + krogerClientSecret);
 
 // (async () => {
 //   const response = await fetch(tokenUrl, {

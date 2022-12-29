@@ -33,7 +33,7 @@ Response: {
   ]
 }
 
-Prompt: Give me a recipe and an ingredient list for a meal that can serve 5. ${mealInput}.
+Prompt: Give me a recipe and an ingredient list for a meal. ${mealInput}.
 Response:
 `;
 // temp remove so we can test kroger implementation
