@@ -9,7 +9,13 @@ function App() {
 
   const fetchMeal = async () => {
     setLog(l => [...l, 'fetchMeal called'])
-    const response = await supabaseClient.executeFunction('get-meals', { mealPrompt: query });
+    let response;
+    try {
+     response = await supabaseClient.executeFunction('get-meals', { mealPrompt: query });
+    } catch (e) {
+      setLog(l => [...l, e.message])
+      setLog(l => [...l, e.trace])
+    }
     setLog(l => [...l, response]);
 
     setMeal(response.data);

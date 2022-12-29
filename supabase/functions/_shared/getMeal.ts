@@ -3,6 +3,8 @@ import jsonic from "https://esm.sh/jsonic";
 
 const getMeal = async (mealInput: string, numberOfTries = 0) => {
   const mealInputPrompt = `
+  I will give you a prompt for a recipe. You will respond with the recipe and ingredients in JSON format.
+
 Prompt: Give me a recipe and an ingredient list for a meal.
 Response: {
   "meal_name": "Meal Name",
@@ -23,6 +25,7 @@ Response:
 `;
 
   const openAPIResponse = await mealPromptRequest(mealInputPrompt);
+  console.log(openAPIResponse);
   const mealOutput = openAPIResponse.choices[0].text;
 
   // console.log('mealOutput: ', mealOutput);

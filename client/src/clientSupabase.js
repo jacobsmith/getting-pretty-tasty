@@ -7,12 +7,11 @@ const supabase = createClient(supabaseUrl, supabasePublicKey);
 
 const supabaseClient = {
   supabase,
-  executeFunction: async (functionName, params) => {
-    return await fetch('https://htqvmfgbaqyytxxmlimh.functions.supabase.co/' + functionName, {
+  executeFunction: (functionName, params) => {
+    return fetch('https://htqvmfgbaqyytxxmlimh.functions.supabase.co/' + functionName, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + supabasePublicKey,
-        'Content-Type': 'application/json'
       },
       body: JSON.stringify(params)
     })
