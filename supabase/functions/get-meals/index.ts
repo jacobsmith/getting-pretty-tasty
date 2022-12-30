@@ -23,6 +23,6 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify(meal),
-    { headers: { "Content-Type": "application/json" } },
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   )
 })

@@ -28,12 +28,16 @@ Response:
   console.log(openAPIResponse);
   const mealOutput = openAPIResponse.choices[0].text;
 
-  // console.log('mealOutput: ', mealOutput);
+  const funkyQuotes = /“|”/g;
+  const funkySingleQuotes = /‘|’/g;
+  let sanitizedMealOutput = mealOutput.replace(funkyQuotes, '"');
+  sanitizedMealOutput = sanitizedMealOutput.replace(funkySingleQuotes, "'");
 
   try {
-    return jsonic(mealOutput);
+    return jsonic(sanitizedMealOutput);
   } catch (e) {
     if (numberOfTries < 3) {
+      console.log('could not parse: ', sanitizedMealOutput);
       return getMeal(mealInput, numberOfTries + 1);
     }
 
