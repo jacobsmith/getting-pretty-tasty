@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import supabaseClient from "../clientSupabase";
 import { MenuContext } from "./menu";
 
 const MenuDisplay = () => {
@@ -19,7 +20,21 @@ const MenuDisplay = () => {
     return acc;
   }, []);
 
-  console.log('allIngredients: ', allIngredients);
+  const handleAddToKrogerCart = async () => {
+    const response = await supabaseClient.executeFunction('get-products', { ingredients: allIngredients });
+    console.log(response);
+
+    const { data, error } = response;
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+
+    console.log(data);
+
+  }
 
   return (
     <>
@@ -43,6 +58,8 @@ const MenuDisplay = () => {
             ))
             }
           </ul>
+
+          <button onClick={ handleAddToKrogerCart }>Add to Kroger Cart</button>
         </div>
       )}
     </>
