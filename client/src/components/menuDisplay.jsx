@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import supabaseClient from "../clientSupabase";
 import ChooseProduct from "./chooseProduct";
-import krogerResponse from "./krogerResponse";
 import { MenuContext } from "./menu";
 
 const MenuDisplay = () => {
@@ -30,6 +29,14 @@ const MenuDisplay = () => {
     response.forEach((datum) => {
       setSelectedProducts(s => { return { ...s, [datum.ingredient.name]: datum.products.data[0] }});
     });
+  }
+
+  const addSelectedItemsToKrogerCart = async () => {
+    const response = await supabaseClient.executeFunction('add-products-to-cart', { products: selectedProducts });
+    if (response) {
+      console.log('Success!');
+      alert('success!');
+    }
   }
 
   return (
@@ -66,6 +73,8 @@ const MenuDisplay = () => {
               ))
             }
           </ul>
+
+          <button className="bg-green-200 p-4 rounded mt-4" onClick={ addSelectedItemsToKrogerCart }>Send to Kroger Cart!</button>
         </div>
       )}
     </>
