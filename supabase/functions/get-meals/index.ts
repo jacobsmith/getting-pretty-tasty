@@ -12,7 +12,6 @@ const corsHeaders = {
 
 serve(async (req) => {
   const { method } = req;
-  console.log('Method: ', method);
   if (method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }

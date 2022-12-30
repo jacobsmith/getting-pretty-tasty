@@ -1,7 +1,8 @@
-import { config } from 'https://deno.land/x/dotenv/mod.ts';
+// import { config } from 'https://deno.land/x/dotenv/mod.ts';
 import supabaseClient from './supabaseClient.ts';
 import { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
-await config({export: true});
+import { updateKrogerTokensInSupabase } from './supabaseClient.ts';
+// await config({export: true});
 
 const redirect_uri = 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth';
 let apiUrl = 'https://api.kroger.com/v1/';
@@ -86,6 +87,11 @@ class KrogerAPI {
     });
 
     const data = await response.json()
+
+    if (data.access_token) {
+      this.userAccessToken = data.access_token;
+      this.userRefreshToken = data.refresh_token;
+    }
     return data;
   }
 
@@ -158,31 +164,8 @@ class KrogerAPI {
     if (response.status === 401) {
       console.log('unauthorized, refreshing token');
       const refreshTokenResponse = await this.refreshTokens();
-
-      console.log('refreshTokenResponse: ', refreshTokenResponse);
-
-      if (refreshTokenResponse.access_token) {
-        this.userAccessToken = refreshTokenResponse.access_token;
-        this.userRefreshToken = refreshTokenResponse.refresh_token;
-
-        const { data, error } = await this.supabaseClient.from('users').select('*').eq('email', this.userEmail);
-
-        console.log('refreshed token:', data);
-
-        if (error) { throw error; }
-
-        const user = data[0];
-
-        console.log(user);
-
-
-        await this.supabaseClient
-          .from('user_access_tokens')
-          .update({ refresh_token: refreshTokenResponse.refresh_token, access_token: refreshTokenResponse.access_token })
-          .eq('email', this.userEmail);
-
-        return this.addItemsToCart(items);
-      }
+      await updateKrogerTokensInSupabase(refreshTokenResponse.access_token, refreshTokenResponse.refresh_token, this.userEmail || '');
+      return this.addItemsToCart(items);
     }
     
     return { success: false, error: response }

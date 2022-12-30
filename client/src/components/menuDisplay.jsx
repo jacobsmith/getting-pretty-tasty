@@ -1,11 +1,14 @@
 import { useContext, useState } from "react";
 import supabaseClient from "../clientSupabase";
+import ChooseProduct from "./chooseProduct";
+import krogerResponse from "./krogerResponse";
 import { MenuContext } from "./menu";
 
 const MenuDisplay = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [krogerProducts, setKrogerProducts] = useState([]);
 
-  const { menu } = useContext(MenuContext);
+  const { menu, selectedProducts, setSelectedProducts } = useContext(MenuContext);
 
   const allIngredients = menu.reduce((acc, meal) => {
     meal.ingredients.forEach(ingredient => {
@@ -20,20 +23,13 @@ const MenuDisplay = () => {
     return acc;
   }, []);
 
-  const handleAddToKrogerCart = async () => {
+  const fetchKrogerProducts = async () => {
     const response = await supabaseClient.executeFunction('get-products', { ingredients: allIngredients });
-    console.log(response);
-
-    const { data, error } = response;
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-
-    console.log(data);
-
+ 
+    setKrogerProducts(response);
+    response.forEach((datum) => {
+      setSelectedProducts(s => { return { ...s, [datum.ingredient.name]: datum.products.data[0] }});
+    });
   }
 
   return (
@@ -59,7 +55,17 @@ const MenuDisplay = () => {
             }
           </ul>
 
-          <button onClick={ handleAddToKrogerCart }>Add to Kroger Cart</button>
+          <button onClick={ fetchKrogerProducts }>Fetch Kroger Products</button>
+
+          <hr className="h-1 bg-black" />
+
+          <ul>
+            {
+              allIngredients.map((ingredient) => (
+                <ChooseProduct ingredient={ingredient} products={ krogerProducts.find(x => x.ingredient.name === ingredient.name)?.products?.data }/>
+              ))
+            }
+          </ul>
         </div>
       )}
     </>

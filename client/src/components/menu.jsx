@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { md5 } from './localStorage';
 
 const MenuContext = React.createContext({});
@@ -16,6 +16,7 @@ if (localStorage.getItem('menu')) {
 
 const Menu = ({ children }) => {
   const [menu, setMenu] = React.useState(parsedMenu);
+  const [selectedProducts, setSelectedProducts] = useState({});
 
   const addMeal = (meal) => {
     setMenu([...menu, meal]);
@@ -34,7 +35,7 @@ const Menu = ({ children }) => {
   }
 
   return (
-    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu }}>
+    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu, selectedProducts, setSelectedProducts }}>
       {children}
     </MenuContext.Provider>
   );
