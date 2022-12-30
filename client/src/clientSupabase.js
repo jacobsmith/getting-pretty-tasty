@@ -18,9 +18,6 @@ const supabaseClient = {
     });
 
     const response = await request.json();
-
-    response.id = md5(JSON.stringify(response));
-
     return response;
   },
 }

@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import localMenu from "./localStorage";
+import React, { useContext } from "react";
 import { MenuContext } from "./menu";
 
 // type MealType = {
@@ -13,7 +12,7 @@ const Meal = ({ meal }) => {
 
   return (
     <div className="text-left bg-slate-200 p-4 m-4 md:w-1/3 lg:w-1/5">
-      <h1 className="text-xl">{meal.meal_name}</h1>
+      <h1 className="text-xl">{meal.name}</h1>
 
       {
         mealInMenu(meal) ? (
