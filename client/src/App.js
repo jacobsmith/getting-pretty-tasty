@@ -46,6 +46,12 @@ function App() {
     updateAllMeals();
   }, []);
 
+  // TODO:
+  // 1. ability to remove ingredients from the products to buy
+  // 2. ability to add ingredients to the products to buy
+  // 3. ability to change quantity of ingredients to buy
+  // 4. ability to "modify" a meal with natural language 
+
   return (
     <div className="App">
       <Menu>
