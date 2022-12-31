@@ -1,24 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import supabaseClient from './clientSupabase.js';
+import Meal from './components/meal';
+import Menu from './components/menu';
+import MenuDisplay from './components/menuDisplay';
 
 function App() {
   const [query, setQuery] = useState('');
-  const [meal, setMeal] = useState('');
-  const [log, setLog] = useState([]);
+  const [meal, setMeal] = useState({"meal_name":"Lasagna","ingredients":[{"name":"ground beef","amount":"1 lb"},{"name":"pasta sauce","amount":"1 jar"},{"name":"lasagna noodles","amount":"1 box"},{"name":"shredded mozzarella cheese","amount":"2 cups"},{"name":"ricotta cheese","amount":"1 cup"},{"name":"grated Parmesan cheese","amount":"1/2 cup"}],"instructions":["Preheat oven to 350°F. In a large skillet, heat ground beef over medium heat until browned.","Drain off fat.","Mix in pasta sauce.","In the bottom of a 9x13 inch baking dish, spread a small amount of meat sauce.","Layer with three uncooked lasagna noodles and a little more than half of the ricotta cheese; sprinkle with some mozzarella and Parmesan cheese.","Repeat layers, and top with remaining mozzarella and Parmesan cheeses.","Bake at 350°F for 30 minutes. Let stand 10 minutes before serving."]});
+  const [allMeals, setAllMeals] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchMeal = async () => {
-    setLog(l => [...l, 'fetchMeal called'])
-    let response;
-    try {
-     response = await supabaseClient.executeFunction('get-meals', { mealPrompt: query });
-    } catch (e) {
-      setLog(l => [...l, e.message])
-      setLog(l => [...l, e.trace])
-    }
-    setLog(l => [...l, response]);
-
-    setMeal(response.data);
+    setLoading(true);
+    updateAllMeals();
+    const response = await supabaseClient.executeFunction('get-meals', { mealPrompt: query });
+    setMeal(response);
+    setLoading(false);
   }
 
   let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
@@ -33,19 +31,38 @@ function App() {
     'redirect_uri=' + redirect_uri + '&' +
     'scope=' + scope + '&' +
     'state=jacob.wesley.smith@gmail.com';
+  
+  const updateAllMeals = () => {
+    (async() => {
+      const { data, error } = await supabaseClient.supabase.from('meals').select('*');
+
+      if (!error) {
+        setAllMeals(data);
+      }
+    })();
+  }
+
+  useEffect(() => {
+    updateAllMeals();
+  }, []);
 
   return (
     <div className="App">
-      <a href={ authenticateWithKroger }>Authenticate With Kroger</a>
-      <div className="text-red-500">I'm looking for meals that...</div>
-      <input value={ query } onChange={ (e) => setQuery(e.target.value) } />
-      <button onClick={ fetchMeal }>Search</button>
+      <Menu>
+        <a href={ authenticateWithKroger } target="_blank">Authenticate With Kroger</a>
+        <MenuDisplay />
+        <div className="text-red-500">I'm looking for meals that...</div>
+        <input value={ query } onChange={ (e) => setQuery(e.target.value) } />
+        <button onClick={ fetchMeal }>Search</button>
 
-      <pre>{ JSON.stringify(meal) }</pre>
+        { loading && <div>Going to the ends of the earth to find the perfect dish for you! Hang on, it can take 10-20 seconds. The ends of the earth are kinda far away...</div>}
 
-      {
-        log.map((l, i) => <div key={ i }>{ JSON.stringify(l) }</div>)
-      }
+        { !loading && <Meal meal={ meal } /> }
+
+        <div className='flex flex-wrap'>
+          { allMeals.map(meal => <Meal meal={ meal } />) }
+        </div>
+      </Menu>
     </div>
   );
 }

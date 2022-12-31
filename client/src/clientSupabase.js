@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { md5 } from './components/localStorage';
 
 // Create a single supabase client for interacting with your database
 const supabaseUrl = 'https://htqvmfgbaqyytxxmlimh.supabase.co';
@@ -7,14 +8,17 @@ const supabase = createClient(supabaseUrl, supabasePublicKey);
 
 const supabaseClient = {
   supabase,
-  executeFunction: (functionName, params) => {
-    return fetch('https://htqvmfgbaqyytxxmlimh.functions.supabase.co/' + functionName, {
+  executeFunction: async (functionName, params) => {
+    const request = await fetch('https://htqvmfgbaqyytxxmlimh.functions.supabase.co/' + functionName, {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + supabasePublicKey,
       },
       body: JSON.stringify(params)
-    })
+    });
+
+    const response = await request.json();
+    return response;
   },
 }
 

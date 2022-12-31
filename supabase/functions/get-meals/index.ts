@@ -12,7 +12,6 @@ const corsHeaders = {
 
 serve(async (req) => {
   const { method } = req;
-  console.log('Method: ', method);
   if (method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -23,6 +22,6 @@ serve(async (req) => {
 
   return new Response(
     JSON.stringify(meal),
-    { headers: { "Content-Type": "application/json" } },
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   )
 })
