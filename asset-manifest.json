@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/getting-pretty-tasty/static/css/main.47a3017c.css",
-    "main.js": "/getting-pretty-tasty/static/js/main.49a9ee4c.js",
+    "main.js": "/getting-pretty-tasty/static/js/main.9b3b3c8a.js",
     "static/js/787.c4e7f8f9.chunk.js": "/getting-pretty-tasty/static/js/787.c4e7f8f9.chunk.js",
     "index.html": "/getting-pretty-tasty/index.html",
     "main.47a3017c.css.map": "/getting-pretty-tasty/static/css/main.47a3017c.css.map",
-    "main.49a9ee4c.js.map": "/getting-pretty-tasty/static/js/main.49a9ee4c.js.map",
+    "main.9b3b3c8a.js.map": "/getting-pretty-tasty/static/js/main.9b3b3c8a.js.map",
     "787.c4e7f8f9.chunk.js.map": "/getting-pretty-tasty/static/js/787.c4e7f8f9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.47a3017c.css",
-    "static/js/main.49a9ee4c.js"
+    "static/js/main.9b3b3c8a.js"
   ]
 }
