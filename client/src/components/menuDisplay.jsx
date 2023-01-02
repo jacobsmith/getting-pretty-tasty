@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import supabaseClient from "../clientSupabase";
 import ChooseProduct from "./chooseProduct";
 import { MenuContext } from "./menu";
@@ -6,21 +6,7 @@ import { MenuContext } from "./menu";
 const MenuDisplay = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [krogerProducts, setKrogerProducts] = useState([]);
-
-  const { menu, selectedProducts, setSelectedProducts } = useContext(MenuContext);
-
-  const allIngredients = menu.reduce((acc, meal) => {
-    meal.ingredients.forEach(ingredient => {
-      const existingIngredient = acc.find(i => i.name === ingredient.name);
-      if (existingIngredient) {
-        existingIngredient.amount += ingredient.amount;
-      } else {
-        acc.push(ingredient);
-      }
-    });
-
-    return acc;
-  }, []);
+  const { menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients } = useContext(MenuContext);
 
   const fetchKrogerProducts = async () => {
     const response = await supabaseClient.executeFunction('get-products', { ingredients: allIngredients });
@@ -57,7 +43,9 @@ const MenuDisplay = () => {
           <ul>
             {
             allIngredients.map((ingredient, index) => (
-              <li key={'ingredient: ' + index}>{ingredient.name} - { ingredient.amount }</li>
+              <li key={'ingredient: ' + index} onClick={ () => toggleIngredient(ingredient) } className={ ingredient.doNotPurchase ? 'line-through' : '' }>
+                {ingredient.name} - { ingredient.amount }
+              </li>
             ))
             }
           </ul>
@@ -68,7 +56,7 @@ const MenuDisplay = () => {
 
           <ul>
             {
-              allIngredients.map((ingredient) => (
+              purchasingIngredients.map((ingredient) => (
                 <ChooseProduct ingredient={ingredient} products={ krogerProducts.find(x => x.ingredient.name === ingredient.name)?.products?.data }/>
               ))
             }

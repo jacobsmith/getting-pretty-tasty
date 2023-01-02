@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { md5 } from './localStorage';
 
 const MenuContext = React.createContext({});
@@ -17,6 +17,7 @@ if (localStorage.getItem('menu')) {
 const Menu = ({ children }) => {
   const [menu, setMenu] = React.useState(parsedMenu);
   const [selectedProducts, setSelectedProducts] = useState({});
+  const [allIngredients, setAllIngredients] = useState([]);
 
   const addMeal = (meal) => {
     setMenu([...menu, meal]);
@@ -34,8 +35,38 @@ const Menu = ({ children }) => {
     return menu && menu.find((m) => m.id === meal.id);
   }
 
+  const toggleIngredient = (ingredient) => {
+    const updatedIngredients = [...allIngredients];
+    updatedIngredients.forEach((i) => {
+      if (i.name === ingredient.name) {
+        i.doNotPurchase = !i.doNotPurchase;
+      }
+    });
+
+    setAllIngredients(updatedIngredients);
+  }
+
+  useEffect(() => {
+    const parsedIngredients = menu.reduce((acc, meal) => {
+      meal.ingredients.forEach(ingredient => {
+        const existingIngredient = acc.find(i => i.name === ingredient.name);
+        if (existingIngredient) {
+          existingIngredient.amount += ingredient.amount;
+        } else {
+          acc.push(ingredient);
+        }
+      });
+
+      return acc;
+    }, []);
+
+    setAllIngredients(parsedIngredients);
+  }, [menu]);
+
+  const purchasingIngredients = allIngredients.filter((i) => !i.doNotPurchase);
+
   return (
-    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu, selectedProducts, setSelectedProducts }}>
+    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients }}>
       {children}
     </MenuContext.Provider>
   );
