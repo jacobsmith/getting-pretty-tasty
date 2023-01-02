@@ -164,6 +164,7 @@ class KrogerAPI {
     if (response.status === 401) {
       console.log('unauthorized, refreshing token');
       const refreshTokenResponse = await this.refreshTokens();
+      console.log("🚀 ~ file: krogerAPI.ts:167 ~ KrogerAPI ~ addItemsToCart ~ refreshTokenResponse", refreshTokenResponse)
       await updateKrogerTokensInSupabase(refreshTokenResponse.access_token, refreshTokenResponse.refresh_token, this.userEmail || '');
       return this.addItemsToCart(items);
     }

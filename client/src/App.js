@@ -65,8 +65,8 @@ function App() {
 
         { !loading && <Meal meal={ meal } /> }
 
-        <div className='flex flex-wrap'>
-          { allMeals.map(meal => <Meal meal={ meal } />) }
+        <div className='flex flex-wrap justify-center'>
+          { allMeals.map(meal => <Meal meal={ meal } collapsed={ true } />) }
         </div>
       </Menu>
     </div>

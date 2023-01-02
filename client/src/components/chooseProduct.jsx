@@ -39,7 +39,7 @@ const ChooseProduct = ({ ingredient, products }) => {
           selectedProduct && (
             <>
               <div key={'selectedproduct'}>{selectedProduct.description}</div>
-              <div>{selectedProduct.items[0].price.promo || selectedProduct.items[0].price.regular}</div>
+              <div>{ selectedProduct.items[0].price?.promo || selectedProduct.items[0].price?.regular || 'No price found' }</div>
               <img src={ selectedProduct.images[0].sizes[2].url} />
             </>
           )
