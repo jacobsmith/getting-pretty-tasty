@@ -69,6 +69,8 @@ class KrogerAPI {
         })
       });
 
+    console.log(response);
+
     const data = await response.json()
     return data;
   }
@@ -147,7 +149,7 @@ class KrogerAPI {
     return data;
   }
 
-  async addItemsToCart(items: any[]) {
+  async addItemsToCart(items: any[], attempt = 0) {
     let response = await fetch(cartUrl, {
       method: 'PUT',
       headers: {
@@ -162,11 +164,12 @@ class KrogerAPI {
     }
 
     if (response.status === 401) {
+      if (attempt === 2) return { success: false, error: response }
       console.log('unauthorized, refreshing token');
       const refreshTokenResponse = await this.refreshTokens();
       console.log("🚀 ~ file: krogerAPI.ts:167 ~ KrogerAPI ~ addItemsToCart ~ refreshTokenResponse", refreshTokenResponse)
       await updateKrogerTokensInSupabase(refreshTokenResponse.access_token, refreshTokenResponse.refresh_token, this.userEmail || '');
-      return this.addItemsToCart(items);
+      return this.addItemsToCart(items, attempt + 1);
     }
     
     return { success: false, error: response }

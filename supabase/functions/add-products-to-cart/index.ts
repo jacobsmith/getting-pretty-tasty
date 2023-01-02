@@ -46,7 +46,7 @@ serve(async (req) => {
   const justProducts = Object.keys(products).map((key) => {
     return products[key];
   })
-  const response = await userKroger.addItemsToCart(justProducts.map((product: any) => { return { upc: product.upc, quantity: 1 }}));
+  const response = await userKroger.addItemsToCart(justProducts.map((product: any) => { return { upc: product.upc, quantity: product.quantity || 1 }}));
 
   return new Response(
     JSON.stringify(response),
