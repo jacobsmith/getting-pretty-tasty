@@ -7,7 +7,7 @@ import MenuDisplay from './components/menuDisplay';
 
 function App() {
   const [query, setQuery] = useState('');
-  const [meal, setMeal] = useState({"meal_name":"Lasagna","ingredients":[{"name":"ground beef","amount":"1 lb"},{"name":"pasta sauce","amount":"1 jar"},{"name":"lasagna noodles","amount":"1 box"},{"name":"shredded mozzarella cheese","amount":"2 cups"},{"name":"ricotta cheese","amount":"1 cup"},{"name":"grated Parmesan cheese","amount":"1/2 cup"}],"instructions":["Preheat oven to 350°F. In a large skillet, heat ground beef over medium heat until browned.","Drain off fat.","Mix in pasta sauce.","In the bottom of a 9x13 inch baking dish, spread a small amount of meat sauce.","Layer with three uncooked lasagna noodles and a little more than half of the ricotta cheese; sprinkle with some mozzarella and Parmesan cheese.","Repeat layers, and top with remaining mozzarella and Parmesan cheeses.","Bake at 350°F for 30 minutes. Let stand 10 minutes before serving."]});
+  const [meal, setMeal] = useState();
   const [allMeals, setAllMeals] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -63,7 +63,7 @@ function App() {
 
         { loading && <div>Going to the ends of the earth to find the perfect dish for you! Hang on, it can take 10-20 seconds. The ends of the earth are kinda far away...</div>}
 
-        { !loading && <Meal meal={ meal } /> }
+        { !loading && meal && <Meal meal={ meal } /> }
 
         <div className='flex flex-wrap justify-center'>
           { allMeals.map(meal => <Meal meal={ meal } collapsed={ true } />) }
