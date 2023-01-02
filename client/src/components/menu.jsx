@@ -63,10 +63,16 @@ const Menu = ({ children }) => {
     setAllIngredients(parsedIngredients);
   }, [menu]);
 
+  const addCustomIngredient = (ingredient) => {
+    const updatedIngredients = [...allIngredients];
+    updatedIngredients.push({ name: ingredient });
+    setAllIngredients(updatedIngredients);
+  }
+
   const purchasingIngredients = allIngredients.filter((i) => !i.doNotPurchase);
 
   return (
-    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients }}>
+    <MenuContext.Provider value={{ addMeal, removeMeal, mealInMenu, menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients, addCustomIngredient }}>
       {children}
     </MenuContext.Provider>
   );

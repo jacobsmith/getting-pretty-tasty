@@ -6,7 +6,8 @@ import { MenuContext } from "./menu";
 const MenuDisplay = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [krogerProducts, setKrogerProducts] = useState([]);
-  const { menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients } = useContext(MenuContext);
+  const [customIngredient, setCustomIngredient] = useState('');
+  const { menu, selectedProducts, setSelectedProducts, allIngredients, toggleIngredient, purchasingIngredients, addCustomIngredient } = useContext(MenuContext);
 
   const fetchKrogerProducts = async () => {
     const response = await supabaseClient.executeFunction('get-products', { ingredients: allIngredients });
@@ -48,6 +49,8 @@ const MenuDisplay = () => {
               </li>
             ))
             }
+
+            <input type="text" value={ customIngredient } onChange={ (e) => setCustomIngredient(e.target.value)} /><button onClick={ () => { addCustomIngredient(customIngredient); setCustomIngredient('') } }>Add</button>
           </ul>
 
           <button onClick={ fetchKrogerProducts }>Fetch Kroger Products</button>

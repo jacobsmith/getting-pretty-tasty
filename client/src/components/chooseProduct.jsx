@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { MenuContext } from "./menu";
 
 const ChooseProduct = ({ ingredient, products }) => {
