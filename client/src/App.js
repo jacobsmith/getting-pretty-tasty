@@ -54,19 +54,27 @@ function App() {
   // 4. ability to "modify" a meal with natural language 
 
   return (
-    <div className="App">
+    <div className="App bg-slate-100">
       <Menu>
         <a href={ authenticateWithKroger } target="_blank">Authenticate With Kroger</a>
         <QuickAsk />
         <MenuDisplay />
-        <div className="text-red-500">I'm looking for meals that...</div>
-        <input value={ query } onChange={ (e) => setQuery(e.target.value) } />
-        <button onClick={ fetchMeal }>Search</button>
+
+        <div className='h-[50vh] flex justify-center items-center flex-col'>
+          <div>
+            <input value={ query } onChange={ (e) => setQuery(e.target.value) } className="w-64 p-2 rounded" placeholder='My perfect meal is...' />
+          </div>
+          <div>
+            <button onClick={ fetchMeal } className="bg-green-100 cursor-pointer hover:bg-green-200 p-2 rounded m-2">Find my perfect meal</button>
+          </div>
+        </div>
 
         { loading && <div>Going to the ends of the earth to find the perfect dish for you! Hang on, it can take 10-20 seconds. The ends of the earth are kinda far away...</div>}
 
         { !loading && meal && <Meal meal={ meal } /> }
 
+        <div>Or check out the premade dishes below</div>
+        <hr />
 
         <div className='flex flex-wrap justify-center'>
           { allMeals.map(meal => <Meal meal={ meal } collapsed={ true } />) }
