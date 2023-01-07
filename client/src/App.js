@@ -4,6 +4,7 @@ import supabaseClient from './clientSupabase.js';
 import Meal from './components/meal';
 import Menu from './components/menu';
 import MenuDisplay from './components/menuDisplay';
+import QuickAsk from './QuickAsk';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -56,6 +57,7 @@ function App() {
     <div className="App">
       <Menu>
         <a href={ authenticateWithKroger } target="_blank">Authenticate With Kroger</a>
+        <QuickAsk />
         <MenuDisplay />
         <div className="text-red-500">I'm looking for meals that...</div>
         <input value={ query } onChange={ (e) => setQuery(e.target.value) } />
@@ -64,6 +66,7 @@ function App() {
         { loading && <div>Going to the ends of the earth to find the perfect dish for you! Hang on, it can take 10-20 seconds. The ends of the earth are kinda far away...</div>}
 
         { !loading && meal && <Meal meal={ meal } /> }
+
 
         <div className='flex flex-wrap justify-center'>
           { allMeals.map(meal => <Meal meal={ meal } collapsed={ true } />) }

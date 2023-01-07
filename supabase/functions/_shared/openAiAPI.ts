@@ -36,4 +36,15 @@ export const mealPromptRequest = async (prompt: string, temperature = 1) => {
   return response;
 }
 
+export const quickAsk = async (prompt: string, temperature = 1) => {
+  const response = await openaiWrapper.createCompletion({
+    engine: "text-davinci-003",
+    prompt: prompt,
+    temperature,
+    maxTokens: 300,
+  });
+  
+  return response;
+}
+
 export default mealPromptRequest;

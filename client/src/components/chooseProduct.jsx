@@ -34,7 +34,7 @@ const ChooseProduct = ({ ingredient, products }) => {
                         <div>SELECTED</div>
                       ) }
                       <div key={ 'product: ' + index }>{ product.description }</div>
-                      <div>{ product.items[0].price.promo || product.items[0].price.regular }</div>
+                      <div>{ product.items[0].price?.promo || product.items[0].price?.regular }</div>
                       <img src={ product.images[0].sizes[2].url } />
                     </div>
                   )) }
