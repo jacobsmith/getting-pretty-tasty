@@ -28,7 +28,7 @@ const QuickAsk = () => {
           showChat && (
             <div className="flex flex-col w-[300px] bg-white rounded p-2 h-[400px] mb-2">
               <div className="float-right text-blue-300 cursor-pointer hover:text-blue-400" onClick={ () => setShowChat(false) }>Close</div>
-              <div className="flex-1 overflow-auto mb-2">
+              <div className="flex-1 overflow-auto mb-2 space-y-2">
                 <div className="text-left bg-blue-50 rounded p-2">
                   Hi! Here are some example questions you can ask:
                   <br />
