@@ -1,85 +1,28 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import supabaseClient from './clientSupabase.js';
-import Meal from './components/meal';
-import Menu from './components/menu';
-import MenuDisplay from './components/menuDisplay';
-import QuickAsk from './QuickAsk';
+import supabaseClient from './clientSupabase';
+import Dashboard from './dashboard';
+import Login from './login';
+  
+// TODO:
+// 1. ability to "modify" a meal with natural language 
 
 function App() {
-  const [query, setQuery] = useState('');
-  const [meal, setMeal] = useState();
-  const [allMeals, setAllMeals] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const fetchMeal = async () => {
-    setLoading(true);
-    updateAllMeals();
-    const response = await supabaseClient.executeFunction('get-meals', { mealPrompt: query });
-    setMeal(response);
-    setLoading(false);
-  }
-
-  let authUrl = 'https://api.kroger.com/v1/connect/oauth2/authorize';
-  let client_id = 'getsprettytasty-6fe79c7e664cd43d0c322ee1465ec5697471146573710013139';
-  let response_type = 'code';
-  let redirect_uri = 'https://htqvmfgbaqyytxxmlimh.functions.supabase.co/oauth';
-  let scope = 'cart.basic:write';
-
-  const authenticateWithKroger = authUrl + '?' +
-    'client_id=' + client_id + '&' +
-    'response_type=' + response_type + '&' +
-    'redirect_uri=' + redirect_uri + '&' +
-    'scope=' + scope + '&' +
-    'state=jacob.wesley.smith@gmail.com';
+  const [user, setUser] = useState(null);
   
-  const updateAllMeals = () => {
-    (async() => {
-      const { data, error } = await supabaseClient.supabase.from('meals').select('*');
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabaseClient.supabase.auth.getUser();
 
-      if (!error) {
-        setAllMeals(data);
+      if (user) {
+        setUser(user);
       }
     })();
-  }
-
-  useEffect(() => {
-    updateAllMeals();
-  }, []);
-
-  // TODO:
-  // 1. ability to remove ingredients from the products to buy
-  // 2. ability to add ingredients to the products to buy
-  // 3. ability to change quantity of ingredients to buy
-  // 4. ability to "modify" a meal with natural language 
+  });
 
   return (
     <div className="App bg-slate-100">
-      <Menu>
-        <a href={ authenticateWithKroger } target="_blank">Authenticate With Kroger</a>
-        <QuickAsk />
-        <MenuDisplay />
-
-        <div className='h-[50vh] flex justify-center items-center flex-col'>
-          <div>
-            <input value={ query } onChange={ (e) => setQuery(e.target.value) } className="w-64 p-2 rounded" placeholder='My perfect meal is...' />
-          </div>
-          <div>
-            <button onClick={ fetchMeal } className="bg-green-100 cursor-pointer hover:bg-green-200 p-2 rounded m-2">Find my perfect meal</button>
-          </div>
-        </div>
-
-        { loading && <div>Going to the ends of the earth to find the perfect dish for you! Hang on, it can take 10-20 seconds. The ends of the earth are kinda far away...</div>}
-
-        { !loading && meal && <Meal meal={ meal } /> }
-
-        <div>Or check out the premade dishes below</div>
-        <hr />
-
-        <div className='flex flex-wrap justify-center'>
-          { allMeals.map(meal => <Meal meal={ meal } collapsed={ true } />) }
-        </div>
-      </Menu>
+      { user ? <Dashboard /> : <Login setUser={ setUser } /> }
     </div>
   );
 }

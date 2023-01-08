@@ -70,12 +70,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ hello: 'world', request: req.body, params: params }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    return Response.redirect('https://jacobsmith.github.io/getting-pretty-tasty?kroger_auth_success=true', 307);
   } catch (error) {
     console.error(error)
 
