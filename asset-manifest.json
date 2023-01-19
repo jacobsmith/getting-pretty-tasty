@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/getting-pretty-tasty/static/css/main.47a3017c.css",
-    "main.js": "/getting-pretty-tasty/static/js/main.9b3b3c8a.js",
+    "main.css": "/getting-pretty-tasty/static/css/main.042defb2.css",
+    "main.js": "/getting-pretty-tasty/static/js/main.e3359791.js",
     "static/js/787.c4e7f8f9.chunk.js": "/getting-pretty-tasty/static/js/787.c4e7f8f9.chunk.js",
+    "static/media/spoon.png": "/getting-pretty-tasty/static/media/spoon.10f4e0de8b7a76390528.png",
     "index.html": "/getting-pretty-tasty/index.html",
-    "main.47a3017c.css.map": "/getting-pretty-tasty/static/css/main.47a3017c.css.map",
-    "main.9b3b3c8a.js.map": "/getting-pretty-tasty/static/js/main.9b3b3c8a.js.map",
+    "main.042defb2.css.map": "/getting-pretty-tasty/static/css/main.042defb2.css.map",
+    "main.e3359791.js.map": "/getting-pretty-tasty/static/js/main.e3359791.js.map",
     "787.c4e7f8f9.chunk.js.map": "/getting-pretty-tasty/static/js/787.c4e7f8f9.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.47a3017c.css",
-    "static/js/main.9b3b3c8a.js"
+    "static/css/main.042defb2.css",
+    "static/js/main.e3359791.js"
   ]
 }
